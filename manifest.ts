@@ -1,19 +1,20 @@
 import { Manifest } from "deno-slack-sdk/mod.ts";
+import CreateExpenseReport from "./workflows/create_expense_report.js";
 
-//adding created function to manifest
-import { CreateWorkItemFunction } from "./functions/create_work_item.ts";
-
-/**
- * The app manifest contains the app's configuration. This
- * file defines attributes like app name and description.
- * https://api.slack.com/future/manifest
- */
 export default Manifest({
-  name: "azure-boards",
-  description: "Build Slack apps with Deno to connect with Azure Boards",
-  icon: "assets/default_new_app_icon.png",
-  functions: [CreateWorkItemFunction],
-  workflows: [],
-  outgoingDomains: ["dev.azure.com"],
-  botScopes: ["commands", "chat:write", "chat:write.public"],
+  name: "ERP Custom Integrations",
+  description: "ERP custom integrations for Slack",
+  icon: "assets/ERPCustomIntegrations.png",
+  workflows: [CreateExpenseReport],
+  outgoingDomains: [],
+  botScopes: [
+    "commands",
+    "app_mentions:read",
+    "chat:write",
+    "chat:write.public",
+    "channels:join",
+    "channels:history",
+    "triggers:read",
+    "triggers:write",
+  ],
 });
