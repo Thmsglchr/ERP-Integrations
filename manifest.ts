@@ -1,5 +1,5 @@
 import { Manifest } from "deno-slack-sdk/mod.ts";
-import CreateExpenseReport from "./workflows/create_expense_report.js";
+import CreateExpenseReport from "./workflows/create_expense_report.ts";
 
 export default Manifest({
   name: "ERP Custom Integrations",
@@ -8,13 +8,7 @@ export default Manifest({
   workflows: [CreateExpenseReport],
   outgoingDomains: [],
   botScopes: [
-    "commands",
-    "app_mentions:read",
     "chat:write",
     "chat:write.public",
-    "channels:join",
-    "channels:history",
-    "triggers:read",
-    "triggers:write",
   ],
 });

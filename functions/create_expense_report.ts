@@ -1,5 +1,5 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
-import { SlackAPIClient } from "deno-slack-api-client/mod.ts";
+import { SlackAPIClient } from "slack-web-api-client/mod.ts";
 
 export const def = DefineFunction({
   callback_id: "create_expense_report",
@@ -7,30 +7,64 @@ export const def = DefineFunction({
   source_file: "./functions/create_expense_report.ts",
   input_parameters: {
     properties: {
-      channel_id: { type: Schema.types.channel_id },
+      user_id: { type: Schema.types.string },
+      expense_amount: { type: Schema.types.string },
+      expense_type: { type: Schema.types.string }
     },
-    required: ["channel_id"],
+    required: ["user_id", "expense_amount", "expense_type"],
   },
 });
 
-export default SlackFunction(def, async ({ inputs, env, token }) => {
-  const client = new SlackAPIClient(token);
-
-  try {
-    const authTest = await client.auth.test();
-    console.log("Auth test successful:", authTest);
-  } catch (error) {
-    console.error("Auth test failed:", error);
-    return { error: "Auth test failed" };
-  }
-
-  console.log("Slack function called");
-  console.log(env);
-
+export default SlackFunction(def, async ({ inputs, env }) => {
+  const client = new SlackAPIClient(env.APP_TOKEN);
   try {
     const postMessage = await client.chat.postMessage({
-      channel: inputs.channel_id,
-      text: "Test",
+      channel: inputs.user_id, 
+      blocks: [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": ":white_check_mark: *Your expense report has been successfully created!*"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Reference Number:* `#12345678`"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Amount:* `£"+inputs.expense_amount+"`"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Type:* `"+inputs.expense_type+"`"
+          }
+        },
+        {
+          "type": "actions",
+          "elements": [
+            {
+              "type": "button",
+              "text": {
+                "type": "plain_text",
+                "text": "Modify",
+                "emoji": true
+              },
+              "value": "modify_expense_report",
+              "action_id": "button_modify"
+            }
+          ]
+        }
+      ]      
     });
 
     if (!postMessage.ok) {

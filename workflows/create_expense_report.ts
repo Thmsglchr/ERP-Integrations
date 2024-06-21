@@ -1,19 +1,23 @@
 import { DefineWorkflow, Schema } from "deno-slack-sdk/mod.ts";
-import { def as CreateExpenseReport } from "../functions/create_expense_report.ts";
+import { def as CreateExpenseReportFunction } from "../functions/create_expense_report.ts";
 
-const workflow = DefineWorkflow({
-  callback_id: "create-expense-report-step",
-  title: "Create an Expense Report",
+const CreateExpenseReportWorkflow = DefineWorkflow({
+  callback_id: "create_expense_report_step",
+  title: "Create Expense Report",
   input_parameters: {
     properties: {
-      channel_id: { type: Schema.types.channel_id },
+      user_id: { type: Schema.types.string },
+      expense_amount: { type: Schema.types.string },
+      expense_type: { type: Schema.types.string }
     },
-    required: ["channel_id"],
+    required: ["user_id", "expense_amount", "expense_type"],
   },
 });
 
-workflow.addStep(CreateExpenseReport, {
-  channel_id: workflow.inputs.channel_id,
+CreateExpenseReportWorkflow.addStep(CreateExpenseReportFunction, {
+  user_id: CreateExpenseReportWorkflow.inputs.user_id,
+  expense_amount: CreateExpenseReportWorkflow.inputs.expense_amount,
+  expense_type: CreateExpenseReportWorkflow.inputs.expense_type
 });
 
-export default workflow;
+export default CreateExpenseReportWorkflow;
